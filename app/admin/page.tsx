@@ -118,15 +118,11 @@ export default function AdminPage () {
         body: JSON.stringify({ status: 'Approved' })
       })
       if (!res.ok) throw new Error('Failed to update')
-      const updated = await res.json()
-      setBookings(prev => prev.map(b => (b.id === id ? updated : b)))
-    } catch {
-      const next = bookings.map(b =>
-        b.id === id ? { ...b, status: 'Approved' } : b
-      )
-      setBookings(next)
-      localStorage.setItem('luxforge_bookings', JSON.stringify(next))
-    }
+    } catch {}
+    // Update state locally regardless of PATCH response shape
+    setBookings(prev =>
+      prev.map(b => (b.id === id ? { ...b, status: 'Approved' } : b))
+    )
   }
 
   async function handleRejectBooking (id: string) {
@@ -137,15 +133,10 @@ export default function AdminPage () {
         body: JSON.stringify({ status: 'Rejected' })
       })
       if (!res.ok) throw new Error('Failed to update')
-      const updated = await res.json()
-      setBookings(prev => prev.map(b => (b.id === id ? updated : b)))
-    } catch {
-      const next = bookings.map(b =>
-        b.id === id ? { ...b, status: 'Rejected' } : b
-      )
-      setBookings(next)
-      localStorage.setItem('luxforge_bookings', JSON.stringify(next))
-    }
+    } catch {}
+    setBookings(prev =>
+      prev.map(b => (b.id === id ? { ...b, status: 'Rejected' } : b))
+    )
   }
 
   return (
@@ -303,24 +294,34 @@ export default function AdminPage () {
                                   </span>
                                 </div>
 
-                                {/* Parts List from Array */}
-                                {b.parts && b.parts.length > 0 && (
-                                  <div className='mt-2 pt-2 border-t border-white/5'>
-                                    <span className='text-[10px] text-gray-500 uppercase tracking-widest mb-1 block'>
-                                      Selected Upgrades:
-                                    </span>
-                                    <div className='flex flex-wrap gap-1 max-w-xs whitespace-normal'>
-                                      {b.parts.map((part, i) => (
-                                        <span
-                                          key={i}
-                                          className='inline-block px-1.5 py-0.5 bg-white/10 border border-white/10 rounded text-[9px] text-gray-300 uppercase tracking-wider'
-                                        >
-                                          {part.replace(/_/g, ' ')}
-                                        </span>
-                                      ))}
+                                {/* Parts List from Array (guard for strings) */}
+                                {(() => {
+                                  const safeParts = Array.isArray(b.parts)
+                                    ? b.parts
+                                    : typeof b.parts === 'string'
+                                    ? b.parts
+                                        .split(',')
+                                        .map(s => s.trim())
+                                        .filter(Boolean)
+                                    : []
+                                  return safeParts.length > 0 ? (
+                                    <div className='mt-2 pt-2 border-t border-white/5'>
+                                      <span className='text-[10px] text-gray-500 uppercase tracking-widest mb-1 block'>
+                                        Selected Upgrades:
+                                      </span>
+                                      <div className='flex flex-wrap gap-1 max-w-xs whitespace-normal'>
+                                        {safeParts.map((part, i) => (
+                                          <span
+                                            key={i}
+                                            className='inline-block px-1.5 py-0.5 bg-white/10 border border-white/10 rounded text-[9px] text-gray-300 uppercase tracking-wider'
+                                          >
+                                            {part.replace(/_/g, ' ')}
+                                          </span>
+                                        ))}
+                                      </div>
                                     </div>
-                                  </div>
-                                )}
+                                  ) : null
+                                })()}
                               </div>
                             </div>
                           </div>
