@@ -74,13 +74,11 @@ function CheckoutContent () {
       </div>
     )
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsSubmitting(true)
 
-    // --- LOGIKA PENYIMPANAN DATA (MOCK BACKEND) ---
-    const newBooking = {
-      id: crypto.randomUUID(),
+    const payload = {
       carName: car.name,
       color: selectedColor,
       interiorColor: interiorColor,
@@ -90,25 +88,44 @@ function CheckoutContent () {
       email: formData.email,
       date: formData.date,
       status: 'Pending Review',
-      price: car.price,
-      createdAt: new Date().toISOString()
+      price: car.price
     }
 
-    // Simpan ke LocalStorage Browser
-    const existingBookings = JSON.parse(
-      localStorage.getItem('luxforge_bookings') || '[]'
-    )
-    const updatedBookings = [newBooking, ...existingBookings]
-    localStorage.setItem('luxforge_bookings', JSON.stringify(updatedBookings))
-
-    // Simulasi Delay Server
-    setTimeout(() => {
+    try {
+      const res = await fetch('/api/bookings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      })
+      if (!res.ok) throw new Error('Failed to submit booking')
+      // Success UX
       alert(
         'Permintaan Anda telah diterima! Concierge kami akan segera menghubungi Anda.'
       )
-      // Redirect kemana saja yang diinginkan setelah sukses
       router.push('/showroom')
-    }, 2000)
+    } catch (err) {
+      // Fallback: localStorage (dev/offline only)
+      try {
+        const existing = JSON.parse(
+          localStorage.getItem('luxforge_bookings') || '[]'
+        )
+        const fallbackBooking = {
+          ...payload,
+          id: crypto.randomUUID(),
+          createdAt: new Date().toISOString()
+        }
+        localStorage.setItem(
+          'luxforge_bookings',
+          JSON.stringify([fallbackBooking, ...existing])
+        )
+      } catch {}
+      alert(
+        'Permintaan tersimpan secara lokal. Hubungan jaringan tidak stabil.'
+      )
+      router.push('/showroom')
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   return (

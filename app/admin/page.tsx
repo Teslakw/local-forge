@@ -57,25 +57,34 @@ export default function AdminPage () {
     }
   }
 
-  // Load bookings from localStorage
+  // Load bookings from API (fallback to localStorage if API unavailable)
   useEffect(() => {
-    try {
-      const existing = JSON.parse(
-        localStorage.getItem('luxforge_bookings') || '[]'
-      )
-      // Jika kosong, gunakan seed, jika ada data localStorage gunakan itu
-      if (existing.length === 0 && Array.isArray(bookingsSeed)) {
-        // Hanya untuk demo awal jika kosong
-        setBookings([])
-      } else {
-        setBookings(existing)
+    const load = async () => {
+      setLoading(true)
+      try {
+        const res = await fetch('/api/bookings', { cache: 'no-store' })
+        if (!res.ok) throw new Error('API error')
+        const data = await res.json()
+        setBookings(Array.isArray(data) ? data : [])
+      } catch (e) {
+        try {
+          const existing = JSON.parse(
+            localStorage.getItem('luxforge_bookings') || '[]'
+          )
+          if (existing.length === 0 && Array.isArray(bookingsSeed)) {
+            setBookings([])
+          } else {
+            setBookings(existing)
+          }
+        } catch {
+          setBookings([])
+        }
+      } finally {
+        setLoading(false)
       }
-    } catch (e) {
-      setBookings([])
-    } finally {
-      setLoading(false)
     }
-  }, [])
+    if (loggedIn) load()
+  }, [loggedIn])
 
   const filtered = useMemo(() => {
     if (!q) return bookings
@@ -89,27 +98,55 @@ export default function AdminPage () {
     )
   }, [q, bookings])
 
-  function handleDelete (id: string) {
+  async function handleDelete (id: string) {
     if (!confirm('Delete this request?')) return
-    const next = bookings.filter(b => b.id !== id)
-    setBookings(next)
-    localStorage.setItem('luxforge_bookings', JSON.stringify(next))
+    try {
+      const res = await fetch(`/api/bookings/${id}`, { method: 'DELETE' })
+      if (!res.ok) throw new Error('Failed to delete')
+      setBookings(prev => prev.filter(b => b.id !== id))
+    } catch {
+      const next = bookings.filter(b => b.id !== id)
+      setBookings(next)
+      localStorage.setItem('luxforge_bookings', JSON.stringify(next))
+    }
   }
 
-  function handleApproveBooking (id: string) {
-    const next = bookings.map(b =>
-      b.id === id ? { ...b, status: 'Approved' } : b
-    )
-    setBookings(next)
-    localStorage.setItem('luxforge_bookings', JSON.stringify(next))
+  async function handleApproveBooking (id: string) {
+    try {
+      const res = await fetch(`/api/bookings/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: 'Approved' })
+      })
+      if (!res.ok) throw new Error('Failed to update')
+      const updated = await res.json()
+      setBookings(prev => prev.map(b => (b.id === id ? updated : b)))
+    } catch {
+      const next = bookings.map(b =>
+        b.id === id ? { ...b, status: 'Approved' } : b
+      )
+      setBookings(next)
+      localStorage.setItem('luxforge_bookings', JSON.stringify(next))
+    }
   }
 
-  function handleRejectBooking (id: string) {
-    const next = bookings.map(b =>
-      b.id === id ? { ...b, status: 'Rejected' } : b
-    )
-    setBookings(next)
-    localStorage.setItem('luxforge_bookings', JSON.stringify(next))
+  async function handleRejectBooking (id: string) {
+    try {
+      const res = await fetch(`/api/bookings/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: 'Rejected' })
+      })
+      if (!res.ok) throw new Error('Failed to update')
+      const updated = await res.json()
+      setBookings(prev => prev.map(b => (b.id === id ? updated : b)))
+    } catch {
+      const next = bookings.map(b =>
+        b.id === id ? { ...b, status: 'Rejected' } : b
+      )
+      setBookings(next)
+      localStorage.setItem('luxforge_bookings', JSON.stringify(next))
+    }
   }
 
   return (
