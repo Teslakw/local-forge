@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { promises as fs } from 'fs'
+import path from 'path'
 
-let memoryStore: any[] = []
+const FILE_PATH = path.join(process.cwd(), 'data', 'bookings.json')
 
 async function getKV () {
   try {
@@ -15,22 +17,25 @@ async function getKV () {
   return null
 }
 
-async function readAll () {
-  const kv = await getKV()
-  if (kv) {
-    const data = await kv.get('luxforge:bookings')
-    return Array.isArray(data) ? (data as any[]) : []
+async function readJSON () {
+  try {
+    const buf = await fs.readFile(FILE_PATH, 'utf-8')
+    const data = JSON.parse(buf)
+    return Array.isArray(data) ? data : []
+  } catch {
+    return []
   }
-  return memoryStore
 }
 
-async function writeAll (list: any[]) {
-  const kv = await getKV()
-  if (kv) {
-    await kv.set('luxforge:bookings', list)
-    return
+async function writeJSON (list: any[]) {
+  try {
+    const dir = path.dirname(FILE_PATH)
+    await fs.mkdir(dir, { recursive: true })
+    await fs.writeFile(FILE_PATH, JSON.stringify(list, null, 2), 'utf-8')
+    return true
+  } catch {
+    return false
   }
-  memoryStore = list
 }
 
 export async function PATCH (
@@ -39,13 +44,27 @@ export async function PATCH (
 ) {
   const { id } = await context.params
   const payload = await req.json().catch(() => ({}))
-  const current = await readAll()
+  const kv = await getKV()
+  const current = kv
+    ? Array.isArray(await kv.get('luxforge:bookings'))
+      ? ((await kv.get('luxforge:bookings')) as any[])
+      : []
+    : await readJSON()
   const idx = current.findIndex((b: any) => b.id === id)
   if (idx === -1)
     return NextResponse.json({ error: 'Not found' }, { status: 404 })
   const updated = { ...current[idx], ...payload }
   current[idx] = updated
-  await writeAll(current)
+  if (kv) {
+    await kv.set('luxforge:bookings', current)
+  } else {
+    const ok = await writeJSON(current)
+    if (!ok)
+      return NextResponse.json(
+        { error: 'Gagal menulis file JSON' },
+        { status: 500 }
+      )
+  }
   return NextResponse.json(updated)
 }
 
@@ -54,8 +73,22 @@ export async function DELETE (
   context: { params: Promise<{ id: string }> }
 ) {
   const { id } = await context.params
-  const current = await readAll()
+  const kv = await getKV()
+  const current = kv
+    ? Array.isArray(await kv.get('luxforge:bookings'))
+      ? ((await kv.get('luxforge:bookings')) as any[])
+      : []
+    : await readJSON()
   const next = current.filter((b: any) => b.id !== id)
-  await writeAll(next)
+  if (kv) {
+    await kv.set('luxforge:bookings', next)
+  } else {
+    const ok = await writeJSON(next)
+    if (!ok)
+      return NextResponse.json(
+        { error: 'Gagal menulis file JSON' },
+        { status: 500 }
+      )
+  }
   return NextResponse.json({ ok: true })
 }

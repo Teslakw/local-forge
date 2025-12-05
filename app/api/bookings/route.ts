@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { promises as fs } from 'fs'
+import path from 'path'
 
-// Simple in-memory fallback for local/dev when KV is not configured
-// Note: Not persistent on Vercel. Use Vercel KV in production.
-let memoryStore: any[] = []
+// Dual-mode storage: KV in production (if env present), JSON file locally.
+const FILE_PATH = path.join(process.cwd(), 'data', 'bookings.json')
 
 async function getKV () {
   try {
-    // Only attempt to import when KV envs are present
     if (
       process.env.KV_REST_API_URL &&
       (process.env.KV_REST_API_TOKEN || process.env.KV_URL)
@@ -18,26 +18,37 @@ async function getKV () {
   return null
 }
 
-async function readAll () {
-  const kv = await getKV()
-  if (kv) {
-    const data = await kv.get('luxforge:bookings')
-    return Array.isArray(data) ? (data as any[]) : []
+async function readJSON () {
+  try {
+    const buf = await fs.readFile(FILE_PATH, 'utf-8')
+    const data = JSON.parse(buf)
+    return Array.isArray(data) ? data : []
+  } catch (e) {
+    // Jika file belum ada, kembalikan array kosong
+    return []
   }
-  return memoryStore
 }
 
-async function writeAll (list: any[]) {
-  const kv = await getKV()
-  if (kv) {
-    await kv.set('luxforge:bookings', list)
-    return
+async function writeJSON (list: any[]) {
+  try {
+    const dir = path.dirname(FILE_PATH)
+    // Pastikan folder ada
+    await fs.mkdir(dir, { recursive: true })
+    await fs.writeFile(FILE_PATH, JSON.stringify(list, null, 2), 'utf-8')
+    return true
+  } catch (e) {
+    return false
   }
-  memoryStore = list
 }
 
 export async function GET () {
-  const list = await readAll()
+  const kv = await getKV()
+  if (kv) {
+    const data = await kv.get('luxforge:bookings')
+    const list = Array.isArray(data) ? (data as any[]) : []
+    return NextResponse.json(list)
+  }
+  const list = await readJSON()
   return NextResponse.json(list)
 }
 
@@ -75,9 +86,22 @@ export async function POST (req: NextRequest) {
       )
     }
 
-    const current = await readAll()
-    const updated = [booking, ...current]
-    await writeAll(updated)
+    const kv = await getKV()
+    if (kv) {
+      const existing = await kv.get('luxforge:bookings')
+      const list = Array.isArray(existing) ? (existing as any[]) : []
+      await kv.set('luxforge:bookings', [booking, ...list])
+    } else {
+      const current = await readJSON()
+      const updated = [booking, ...current]
+      const ok = await writeJSON(updated)
+      if (!ok) {
+        return NextResponse.json(
+          { error: 'Gagal menulis file JSON' },
+          { status: 500 }
+        )
+      }
+    }
 
     return NextResponse.json(booking, { status: 201 })
   } catch (e) {
