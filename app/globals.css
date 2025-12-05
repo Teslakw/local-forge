@@ -1,26 +1,160 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --foreground-rgb: 255, 255, 255;
+  --background-start-rgb: 0, 0, 0;
+  --background-end-rgb: 0, 0, 0;
+  --background: #0a0a0a;
+  --foreground: #ededed;
+  --gold: #c8a75f;
+  --gold-soft: #b7974f;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+body {
+  color: rgb(var(--foreground-rgb));
+  background: linear-gradient(to bottom,
+      transparent,
+      rgb(var(--background-end-rgb))) rgb(var(--background-start-rgb));
+  font-family: 'Manrope', sans-serif;
+  /* Font default */
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+/* Font Setting untuk Judul Mewah */
+h1,
+h2,
+h3,
+.font-serif {
+  font-family: 'Cinzel', serif;
+}
+
+/* Scrollbar Kustom biar hitam elegan */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #000;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #333;
+  border-radius: 4px;
+}
+
+/* Animasi Kustom */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Premium animation utilities */
+@keyframes fade-in {
+  from {
+    opacity: 0
+  }
+
+  to {
+    opacity: 1
+  }
+}
+
+@keyframes slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(12px)
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0)
+  }
+}
+
+@keyframes width-in {
+  from {
+    width: 0
+  }
+
+  to {
+    width: 6rem
+  }
+}
+
+@keyframes card-in {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.98)
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1)
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 800ms ease forwards;
+}
+
+.animate-slide-up {
+  animation: slide-up 800ms ease forwards;
+}
+
+.animate-width-in {
+  animation: width-in 1000ms ease forwards;
+}
+
+.animate-card-in {
+  animation: card-in 700ms ease forwards;
+}
+
+
+
+@keyframes pulse {
+
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.05);
   }
 }
 
 body {
-  background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: radial-gradient(1200px 600px at 20% -10%, rgba(200, 167, 95, 0.08), transparent),
+    radial-gradient(800px 400px at 80% -10%, rgba(255, 255, 255, 0.06), transparent),
+    var(--background);
+}
+
+/* Luxury header refinements */
+nav {
+  font-feature-settings: "ss01" on, "liga" on;
+}
+
+.font-serif {
+  font-family: "Playfair Display", ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
+}
+
+.lux-underline {
+  position: relative;
+}
+
+.lux-underline::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -4px;
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(200, 167, 95, 0) 0%, rgba(200, 167, 95, 0.7) 50%, rgba(200, 167, 95, 0) 100%);
 }
