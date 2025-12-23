@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react'
 import Link from 'next/link'
 import Footer from '@/components/Footer'
-import { ArrowRight, Wrench, Car, Users, Hexagon, Star } from 'lucide-react'
+import { ArrowRight, Wrench, Car, Users, Hexagon, Star, Search, ClipboardCheck, Mail, Building2, CheckCircle2 } from 'lucide-react'
 import { AnimateOnScroll, AnimatedSection } from '@/components/AnimateOnScroll'
 
 // Hero Slides Data
@@ -118,7 +118,61 @@ export default function Home() {
         </div>
       </AnimatedSection>
 
-      {/* 3. THE INNER CIRCLE (Community) */}
+      {/* 3. HOW IT WORKS */}
+      <AnimatedSection className='py-24 px-6 md:px-16 bg-[#050505] relative'>
+        <div className='absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-gold/30 to-transparent' />
+
+        <div className='max-w-6xl mx-auto'>
+          <AnimateOnScroll animation='fade-up' className='text-center mb-16'>
+            <span className='text-gold font-industrial uppercase tracking-[0.3em] text-xs font-bold'>Simple Process</span>
+            <h2 className='text-4xl md:text-5xl font-serif mt-4'>How It Works</h2>
+            <p className='text-gray-400 mt-4 max-w-2xl mx-auto'>From browsing to driving your dream vehicle, we make the process seamless and transparent.</p>
+          </AnimateOnScroll>
+
+          <div className='grid grid-cols-1 md:grid-cols-5 gap-6'>
+            {[
+              { step: '01', title: 'Browse & Request', desc: 'Explore our showroom, configure your vehicle, or submit a rental request online.', Icon: Search },
+              { step: '02', title: 'Review & Approval', desc: 'Our team reviews your request and prepares the best options for you.', Icon: ClipboardCheck },
+              { step: '03', title: 'Email Confirmation', desc: 'Once approved, you receive a confirmation email with all the details.', Icon: Mail },
+              { step: '04', title: 'Visit Showroom', desc: 'Come to our showroom to see the vehicle, discuss details, and finalize the deal.', Icon: Building2 },
+              { step: '05', title: 'Deal & Delivery', desc: 'Agreement signed, payment settled, and your dream vehicle is ready!', Icon: CheckCircle2 }
+            ].map((item, idx) => (
+              <AnimateOnScroll key={idx} animation='fade-up' delay={0.1 + idx * 0.1}>
+                <div className='relative text-center p-6'>
+                  {/* Connector Line */}
+                  {idx < 4 && (
+                    <div className='hidden md:block absolute top-12 left-[60%] w-full h-px bg-gradient-to-r from-gold/50 to-transparent' />
+                  )}
+
+                  {/* Icon */}
+                  <div className='w-16 h-16 mx-auto mb-4 border border-gold/30 rounded-full flex items-center justify-center bg-gold/10'>
+                    <item.Icon size={28} className='text-gold' />
+                  </div>
+
+                  {/* Step Badge */}
+                  <div className='inline-block px-3 py-1 bg-white/5 border border-white/10 text-gray-400 text-[10px] font-industrial font-bold tracking-widest mb-3'>
+                    STEP {item.step}
+                  </div>
+
+                  <h3 className='text-lg font-serif mb-2'>{item.title}</h3>
+                  <p className='text-gray-500 text-sm leading-relaxed'>{item.desc}</p>
+                </div>
+              </AnimateOnScroll>
+            ))}
+          </div>
+
+          {/* CTA */}
+          <AnimateOnScroll animation='fade-up' delay={0.6}>
+            <div className='text-center mt-12'>
+              <Link href='/showroom' className='lux-button inline-block px-10 py-4 bg-gold text-black font-bold uppercase tracking-[0.2em] hover:bg-white transition-colors'>
+                Start Your Journey
+              </Link>
+            </div>
+          </AnimateOnScroll>
+        </div>
+      </AnimatedSection>
+
+      {/* 4. THE INNER CIRCLE (Community) */}
       <AnimatedSection className='py-24 bg-[#050505] relative overflow-hidden'>
         <div className='absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-gold/30 to-transparent' />
 
