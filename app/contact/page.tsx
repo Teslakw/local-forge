@@ -159,7 +159,7 @@ export default function ContactPage() {
                             src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3944.1008478!2d115.1686!3d-8.6916!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2dd2471f9e8e3f17%3A0x9c4f3de3f6d3a2be!2sSeminyak%2C%20Bali!5e0!3m2!1sen!2sid!4v1703324400000!5m2!1sen!2sid"
                             width="100%"
                             height="450"
-                            style={{ border: 0, filter: 'grayscale(100%) invert(92%) contrast(83%)' }}
+                            style={{ border: 0 }}
                             allowFullScreen
                             loading="lazy"
                             referrerPolicy="no-referrer-when-downgrade"
