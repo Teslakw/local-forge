@@ -145,6 +145,41 @@ export default function ContactPage() {
                 </div>
             </AnimatedSection>
 
+            {/* Google Map Section */}
+            <AnimatedSection className='px-6 md:px-24 pb-24'>
+                <AnimateOnScroll animation='fade-up'>
+                    <div className='text-center mb-12'>
+                        <span className='text-gold font-industrial text-xs tracking-[0.3em] font-bold block mb-2'>Find Us</span>
+                        <h2 className='text-3xl md:text-4xl font-serif'>Our Location</h2>
+                    </div>
+                </AnimateOnScroll>
+                <AnimateOnScroll animation='fade-up' delay={0.2}>
+                    <div className='border border-white/10 overflow-hidden'>
+                        <iframe
+                            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3944.1008478!2d115.1686!3d-8.6916!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2dd2471f9e8e3f17%3A0x9c4f3de3f6d3a2be!2sSeminyak%2C%20Bali!5e0!3m2!1sen!2sid!4v1703324400000!5m2!1sen!2sid"
+                            width="100%"
+                            height="450"
+                            style={{ border: 0, filter: 'grayscale(100%) invert(92%) contrast(83%)' }}
+                            allowFullScreen
+                            loading="lazy"
+                            referrerPolicy="no-referrer-when-downgrade"
+                            title="LuxForge Location"
+                        ></iframe>
+                    </div>
+                    <div className='mt-6 flex flex-wrap justify-center gap-8 text-center'>
+                        <div>
+                            <p className='text-gold font-serif text-lg'>Jl. Sunset Road No. 88</p>
+                            <p className='text-gray-500 text-sm'>Seminyak, Bali 80361</p>
+                        </div>
+                        <div className='w-px h-12 bg-white/10 hidden md:block'></div>
+                        <div>
+                            <p className='text-gold font-serif text-lg'>+62 361 123 4567</p>
+                            <p className='text-gray-500 text-sm'>Mon - Sat: 9AM - 6PM</p>
+                        </div>
+                    </div>
+                </AnimateOnScroll>
+            </AnimatedSection>
+
             <Footer />
         </div>
     )
