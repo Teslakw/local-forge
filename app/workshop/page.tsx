@@ -9,13 +9,13 @@ import { Award, Shield, MapPin, Phone, Mail, CheckCircle } from 'lucide-react'
 const BRAND_CERTIFICATIONS = [
     {
         name: 'Ferrari',
-        logo: 'https://upload.wikimedia.org/wikipedia/en/d/d0/Scuderia_Ferrari_Logo.svg',
+        logo: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRyjLglNKllY_wZYMxjSWELFJYZMNzlNcXFaQ&s',
         cert: 'Authorized Service Partner',
         desc: 'Licensed to modify and service Ferrari vehicles to factory standards.'
     },
     {
         name: 'Porsche',
-        logo: 'https://upload.wikimedia.org/wikipedia/en/8/8c/Porsche_logo.svg',
+        logo: 'https://images.seeklogo.com/logo-png/39/1/porsche-logo-png_seeklogo-399884.png',
         cert: 'Certified Workshop',
         desc: 'Trained technicians for performance upgrades and maintenance.'
     },
@@ -39,7 +39,7 @@ const BRAND_CERTIFICATIONS = [
     },
     {
         name: 'Ducati',
-        logo: 'https://upload.wikimedia.org/wikipedia/commons/8/8e/Ducati_red_logo.svg',
+        logo: 'https://images.seeklogo.com/logo-png/28/1/ducati-logo-png_seeklogo-286709.png',
         cert: 'Performance Center',
         desc: 'Race-ready upgrades and track preparation services.'
     }
